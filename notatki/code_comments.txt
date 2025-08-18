@@ -1,0 +1,21 @@
+https://docs.flutter.dev/ui/layout/constraints
+zaczac od: framework - widgets 
+zaczac od drawFrame i buildScope (build owner)
+
+1. 
+why here is called List.of instead of iterating through _observers directly?
+for (final WidgetsBindingObserver observer
+        in List<WidgetsBindingObserver>.of(_observers)) {
+      if (await observer.didPopRoute()) {
+        return true;
+      }
+    }
+
+AI:
+You've highlighted a common pattern in Flutter's codebase, and the reason for using List<WidgetsBindingObserver>.of(_observers) instead of directly iterating through _observers often relates to robustness, immutability during iteration, and potential concurrent modifications.
+
+--------------------------------------------
+2. 
+why firstFrameRasterized is so important?
+AI:
+firstFrameRasterized is a crucial metric in Flutter for several key reasons, all revolving around the perceived startup time and responsiveness of your application. It marks the point when the very first frame of your app's UI has been rendered to the screen
