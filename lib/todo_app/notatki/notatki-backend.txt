@@ -1,0 +1,517 @@
+firebase auth package
+
+There are other platforms that offer authentication services. Here are some of the most popular ones:
+
+Supabase - If your app is already using Supabase, this is a no-brainer.
+Appwrite - If you want to use a modern, open-source backend platform, Appwrite is a great option.
+AWS Cognito - If you are already using AWS, this is a no-brainer.
+Auth0 - If you want a more customizable authentication solution, Auth0 is a great option
+-------------------------------------
+nosql 
+Now, think about how you might organize files on your computer. Instead of using one large spreadsheet, you have folders that can contain different kinds of files and even sub-folders. NoSQL databases work similarly by allowing more flexibility in how data is stored and organized. Here’s an example using a document-based NoSQL approach:
+
+-- Users collection
+{
+  "id": 1,
+  "name": "John",
+  "email": "john@email.com",
+  "posts": [
+    {
+      "id": 1,
+      "content": "Hello world!"
+    },
+    {
+      "id": 2,
+      "content": "Another post"
+    }
+  ]
+},
+{
+  "id": 2,
+  "name": "Sarah",
+  "email": "sarah@email.com"
+}
+
+Flexible Structure: Data can be stored in collections and can be nested to have sub-folders.
+No Fixed Schema: Data doesn’t need to follow a specific format.
+Ideal For: Applications where data is doesn’t have too many relationships between, and the data makes sense to store in a folder structure.
+
+-------------------------------------
+
+local storage : shared_preferences 
+
+The next level up is using something like sqflite, like we do in this course (we use sqlite3, which is very similar but supports the web platform. But sqflite is a more popular package).
+
+This package is a bare-bones SQL database. If you look at the counter_view_model.dart file, you will see the actual SQL code that is used to interact with the database.
+
+You can do everything using just SQL commands, but there are a few popular packages that make it simpler.
+
+drift - reactive database based on SQLite
+isar - fully async NoSQL database
+sembast - simple NoSQL database
+objectbox - Object-oriented NoSQL database
+-------------------------------------
+
+cloud storage 
+
+he most popular options for cloud storage are firebase, supabase, and appwrite.
+
+--------------------------
+
+Caching
+No matter what approach you take for cloud storage, you will need to implement caching and offline support. This is because networks are unreliable and you need to be able to continue using the app even if the network is down.
+
+If the network is down at any point, the data should be stored on the device and then synced once the network is available.
+
+You do this by caching the data locally and then syncing it to the cloud. Services like firebase and supabase have built-in caching so you don’t need to worry about it.
+
+----------------------
+
+API 
+
+When building mobile apps, you often need to communicate with external services. Whether it’s authenticating users, storing data in a database, or getting the current weather - your app needs a way to talk to these services.
+
+What is an API?
+An API (Application Programming Interface) is like a waiter at a restaurant:
+
+Takes your order (request)
+Delivers it to the kitchen (backend service)
+Brings back your food (response)
+Follows specific rules for service (protocol)
+How APIs Work in Flutter
+We learned about authentication and databases in previous lessons. Those are both part of the backend system, while an API is the connection between your Flutter app and the backend.
+
+Types of APIs
+There are several types of APIs you might use in your Flutter app:
+
+REST APIs
+Most common type
+Uses standard HTTP methods (GET, POST, PUT, DELETE)
+Typically returns JSON data
+Stateless (each request is independent)
+GraphQL APIs
+More flexible data querying
+Single endpoint for all operations
+Client specifies exactly what data it needs
+Popular for complex applications
+WebSocket APIs
+Real-time, two-way communication
+Maintains an open connection
+Great for chat apps or live updates
+More resource-intensive
+Common Use Cases
+APIs are everywhere in modern apps. Here are some common examples:
+
+User authentication (login/signup)
+Database operations (save/retrieve data)
+Payment processing
+Social media integration
+Weather data
+Maps and location services
+Remember: APIs are the bridges that connect your Flutter app to your desired backend. Understanding how to work with them is crucial for building applications.
+
+-------------
+http 
+
+HTTP (Hypertext Transfer Protocol) is how your Flutter app talks to servers on the internet. Think of it like sending and receiving mail - you need to know the address (URL), what you’re sending (request), and expect something back (response).
+
+HTTP Methods
+The most common HTTP methods are:
+
+GET: Fetch data (like getting your email)
+POST: Create new data (like sending a new email)
+PUT/PATCH: Update existing data (like editing a draft)
+DELETE: Remove data (like moving to trash)
+Status Codes
+When you make an HTTP request, the server responds with a status code that tells you what happened:
+
+2xx: Success (200 = OK, 201 = Created)
+4xx: Client errors (404 = Not Found, 401 = Unauthorized)
+5xx: Server errors (500 = Internal Server Error)
+Making HTTP Requests in Flutter
+There are a few packages that are popular for making HTTP requests in Flutter.
+
+The one we use is the http package which is minimal and maintained by the Dart team. Here is an example of a GET and POST request:
+
+import 'package:http/http.dart' as http;
+
+// GET request
+final response = await http.get(Uri.parse('https://api.example.com/data'));
+
+if (response.statusCode == 200) {
+  // Success! Use response.body
+  print('Got data: ${response.body}');
+} else {
+  // Handle error
+  print('Failed with status: ${response.statusCode}');
+}
+
+// POST request with JSON data
+final postResponse = await http.post(
+  Uri.parse('https://api.example.com/create'),
+  headers: {'Content-Type': 'application/json'},
+  body: jsonEncode({'name': 'John', 'age': 30}),
+);
+
+Common Headers
+Headers provide extra information about the request:
+
+final headers = {
+  'Content-Type': 'application/json',     // Type of data you're sending
+  'Accept': 'application/json',           // Type of data you want back
+  'Authorization': 'Bearer your_token',   // Authentication token
+};
+
+Best Practices
+Always handle errors - Network requests can fail
+Use timeout - Don’t wait forever for responses
+Parse responses carefully - Server data might not be what you expect
+Close clients - Release resources when done (In flutter you usually don’t have to care about that as you have a single http instance for the entire application)
+// Example with best practices
+Future<String> fetchData() async {
+  final client = http.Client();
+  try {
+    final response = await client.get(
+      Uri.parse('https://api.example.com/data'),
+    ).timeout(
+      const Duration(seconds: 10),
+      onTimeout: () => throw TimeoutException('Request took too long'),
+    );
+
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      throw HttpException('Failed with status: ${response.statusCode}');
+    }
+  } finally {
+    client.close();
+  }
+}
+
+Remember: HTTP requests are asynchronous - they take time to complete. Always use async/await or handle Futures appropriately.
+-------------------------
+Bearer tokens are a type of access token used in HTTP authentication. They are called “bearer” tokens because whoever has the token can use it - like how anyone who bears (holds) a ticket can enter a concert.
+
+How They Work
+When you authenticate (login), the server gives you a token
+You include this token in the header of future requests
+The server validates the token before processing the request
+In the last lesson we didn’t need to use a bearer token, because we were calling a public API.
+
+// Example HTTP request with bearer token
+final response = await http.get(
+  Uri.parse('https://api.example.com/data'),
+  headers: {
+    'Authorization': 'Bearer ${yourTokenHere}',
+  },
+);
+
+Best Practices
+Always use HTTPS - Bearer tokens are sent in plain text
+Store securely - Never store in code or version control
+Handle expiration - Tokens usually have a limited lifetime
+Remove on logout - Clear tokens when the user signs out
+Common Use Cases
+API Authentication
+OAuth 2.0
+JWT (JSON Web Tokens)
+
+--------------------------
+
+To understand retry we first need to understand some different requirements for doing actual retry at scale.
+
+Let’s learn about exponential backoff and jitter.
+
+Exponential backoff
+Exponential backoff means that when you make a request and that fails you won’t instantly make another request.
+
+A typical example of exponential backoff might look something like this.
+
+Retry 1: Wait 1 second
+Retry 2: Wait 2 seconds
+Retry 3: Wait 4 seconds
+When you do use exponential backoff or any retry logic for that matter you should almost always have some kind of retry limit, otherwise you would have retries happening indefinitely.
+
+Jitter
+Jitter is usually part of an exponential backoff functionality by introducing a random “delay” in the retry.
+
+For example, instead of waiting exactly 2 seconds, the request would wait for a duration anywhere between 1.5 and 2.5 seconds. The previous example could look something like this.
+
+User 1:
+
+Retry 1: Wait 1.2 second
+Retry 2: Wait 2.4 seconds
+Retry 3: Wait 3.8 seconds
+User 2:
+
+Retry 1: Wait 1 second
+Retry 2: Wait 1.8 seconds
+Retry 3: Wait 4.2 seconds
+We gave two examples above for a very important reason. The reason you would have jitter is to reduce the risk of something called “thundering herds”, this is when multiple clients retry simultaneously (maybe after an outage?) which would overwhelm the system.
+
+How to do a retry request
+This depends on the solution you want to go with doing HTTP requests. There are tons of different packages for handling network requests and in this case, we will use http by the dart team.
+
+In the http package there is a RetryClient this one will implement the logic required for handling retries. In Flutter you would just have to create this client once and use it throughout your application.
+
+Below is a small snippet of code showcasing how to use the RetryClient so we close the client right after the request is done.
+
+void main() async {
+  // Create a RetryClient with default exponential backoff
+  final client = RetryClient(
+    http.Client(),
+    retries: 5, // Maximum number of retries
+   when: (response) =>
+      response.statusCode == 502 ||
+      response.statusCode == 503 ||
+      response.statusCode == 504, // Retry only transient errors
+    whenError: (error, stackTrace) =>
+        error is http.ClientException, // Retry on network errors
+  );
+
+  try {
+    // Make a GET request
+    final response = await client.get(Uri.parse('https://example.com'));
+
+    if (response.statusCode == 200) {
+      print('Response: ${response.body}');
+    } else {
+      print('Request failed with status: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Request failed with error: $e');
+  } finally {
+    client.close();
+  }
+}
+
+This default implementation will already have exponential backoff implemented but it will not have jitter.
+
+Remember, you don’t have to complicate your app by implementing jitter if you are not currently running into issues with concurrent retries.
+
+But if you want to implement jitter you would have to implement your exponential backoff logic with the delay property.
+
+  // Create a RetryClient with exponential backoff and jitter
+  final client = RetryClient(
+    http.Client(),
+    retries: 5, // Maximum number of retries
+   when: (response) =>
+      response.statusCode == 502 ||
+      response.statusCode == 503 ||
+      response.statusCode == 504, // Retry only transient errors
+    whenError: (error, stackTrace) =>
+        error is http.ClientException, // Retry on network errors
+    delay: (retryCount) {
+      // Implement exponential backoff with jitter
+      final exponentialDelay = pow(2, retryCount) * 100; // Milliseconds
+      final jitter = Random().nextInt(100); // Add randomness (jitter)
+      return Duration(milliseconds: exponentialDelay.toInt() + jitter);
+    },
+  );
+
+  try {
+    // Make a GET request
+    final response = await client.get(Uri.parse('https://example.com'));
+
+    if (response.statusCode == 200) {
+      print('Response: ${response.body}');
+    } else {
+      print('Request failed with status: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Request failed with error: $e');
+  } finally {
+    client.close();
+  }
+
+  -------------------------------
+
+  Interceptors are a requirement in any growing app or even smaller apps.
+
+An interceptor allows you to “intercept” logic before an HTTP request is made but at scale.
+
+What do you mean by “at scale”?
+Imagine the following scenario.
+
+You have 20 different scenarios where you do HTTP requests. For those 20 different scenarios, you always want to do the following.
+
+Log details about the request being made
+renew some kind of bearer token (JWT with refresh token maybe?)
+Including specific headers
+In reality, there could be a range of actions you want to do before making your HTTP request.
+
+This is where interceptors come in.
+
+Interceptors
+There are a couple of options on how to use this, and all of them are valid.
+
+If you are using the normal http package we recommend just using the http_interceptor package which is a thin wrapper to allow interceptors using the official http package. There is nothing wrong implementing your own interceptor though and including it as a util in your project.
+
+In case you want to use an all-in-one solution there is also the dio package. This package allows you to make http requests, but also includes a lot of extra “features” such as interceptors.
+
+
+------------------------- 
+error handling 
+
+When you are doing certain actions such as calling an external api with HttpClient a typical exception that can occur is a SocketException.
+
+Let’s say we would want to return text back in the scenario of a SocketException. We would use a try-catch and specifically catch the SocketException to then return the appropriate message.
+
+Future<String> fetchData(String url) async {
+  final HttpClient client = HttpClient();
+
+  try {
+    // Create the request
+    final HttpClientRequest request = await client.getUrl(Uri.parse(url));
+
+    // Send the request and wait for a response
+    final HttpClientResponse response = await request.close();
+
+    // Read and return the response body
+    if (response.statusCode == 200) {
+      return await response.transform(const Utf8Decoder()).join();
+    } else {
+      throw HttpException('Failed with status code: ${response.statusCode}');
+    }
+  } on SocketException catch (e) {
+    // catch `SocketException` and return a message
+    return 'Error: Unable to fetch data due to a network issue.';
+  } finally {
+    client.close();
+  }
+}
+
+In Dart, and most programming languages, there are built-in class exceptions and custom exceptions.
+
+Built-in exceptions are the ones already pre-defined such as a SocketException which gives you an indication that the request couldn’t be done because of a network issue.
+
+Custom exception classes are exception types that can be defined ourselves. You would use this if you want to be explicit about what has gone wrong. This gets you away from creating and using generic exceptions, which is nice because in most scenarios you should catch the specific exceptions you expect.
+
+So instead of doing something like this
+
+throw Exception('You do not have the authority to delete this item');
+
+You would create a custom exception such as this.
+
+class UnauthorizedException implements Exception {
+  UnauthorizedException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => 'UnauthorizedException: $message';
+}
+
+// When thrown we would do the following
+throw UnauthorizedException('You do not have the authority to delete this item');
+
+Assignment
+We have defined a fake exception that will throw when you tap the button. Right now, nothing happens if you press the button though.
+
+What we want you to do is to catch this specific exception and make sure the UI is updated to display the error message.
+
+-------------------------------
+
+Now return values are a bit different. The previous lesson about try-catch. The scenario of wrapping http request with try-catch doesn’t work with return-values because the client doesn’t have return values built in as an error handling approach. This is true for anything in Dart and Flutter, you always have to use try-catch first to handle underlying issues and then opt for return-values.
+
+Return value error handling is not built into the language like it is for other languages like Rust.
+
+Let me give a quick example of how it looks and works.
+
+First we would have to define what result handling we should have. This is directly taken from some of the Flutter architecture documentation, with a small variation which is that we can define the error return type.
+
+sealed class Result<T, R> {
+  const Result();
+
+  /// Creates an instance of Result containing a value
+  factory Result.ok(T value) => Ok(value);
+
+  /// Create an instance of Result containing an error
+  factory Result.error(R result) => Error(result);
+}
+
+/// Subclass of Result for values
+final class Ok<T, R> extends Result<T, R> {
+  const Ok(this.value);
+
+  /// Returned value in the result
+  final T value;
+}
+
+/// Subclass of Result for errors
+final class Error<T, R> extends Result<T, R> {
+  const Error(this.error);
+
+  /// Returned result in result
+  final R error;
+}
+
+If you have a simple method that uses this, you would return either an error or an ok response.
+
+Result<String, String> someFunction(bool returnError) {
+  if(returnError) {
+    return Result.error('opsi')
+  }
+
+  return Result.ok('woo')
+}
+
+You would then handle it with a switch to enforce the handling of the error. Now there is no longer a way for the error handling to be forgotten.
+
+void callSomeFunction() {
+  final result = someFunction()
+    switch (result) {
+      case Ok():
+        // do something
+      case Error():
+          final error = result.error;
+          // Do something with the string error we got
+    }
+}
+
+For the above example we made it simple by just defining a string as the return type. In reality you would probably want to define an enum or sealed class.
+
+Here is an example with a sealed class
+
+sealed class WeatherRequestError {
+  WeatherRequestError(this.error);
+
+  final Exception error;
+}
+
+final class WeatherRequestErrorUnknown extends WeatherRequestError {
+  WeatherRequestErrorUnknown(super.error);
+}
+
+final class WeatherRequestErrorNotFound extends WeatherRequestError {
+  WeatherRequestErrorNotFound(super.error);
+}
+
+/// Now we can use this in our result
+Result<String, WeatherRequestError> getWeather() {
+  if(someCondition) {
+    // You would probably have caught an exception here
+    // instead of creating one that you then pass to the class.
+    return Result.error(WeatherRequestErrorUnknown(Exception('unknown error')))
+  }
+
+  return Result.ok('14 degrees')
+}
+
+/// Now we can handle it like this
+void callGetWeather() {
+  final result = getWeather();
+  switch (result) {
+    case Ok():
+      // do something
+    case Error():
+      switch (result.error) {
+        case WeatherRequestErrorUnknown():
+          // Do something on an unknown error
+        case WeatherRequestErrorNotFound():
+          // Do something if not found
+      }
+  }
+}
+
+Before we continue, we want to mention that there are quite a lot of packages that already have result based classes implemented such as multiple_result or result_dart.
