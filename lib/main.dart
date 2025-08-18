@@ -1,29 +1,22 @@
-// import 'package:flutter/widgets.dart';
-// import 'package:flutter_learn_2025/stoper/app.dart';
+import 'package:flutter/material.dart';
+// import 'package:flutter/rendering.dart';
+import 'package:flutter_learn_2025/my_liquid_glass/home_screen.dart';
+import 'package:flutter_learn_2025/todo_app/app.dart';
+import 'package:flutter_learn_2025/todo_app/utils/locator.dart';
 
-import 'package:flutter_learn_2025/my_flutter/widgets.dart';
-
-//zaczac od: root widget - tutaj tworzy sie hierarchia widgetow - powinny wiec dzialac elementy - monotwanie ich przez build ownera
-//w utworzonych plikach stopniowo dodawac implementacje (na razie to puste odwloania)
-
-void main() {
-  // runApp(StoperApp());
-  runApp(Test());
-}
-
-// zrobic wlasna warstwe widgetow - czyli korzystac w frameworka flutter, ale napisac wlasna warstwe widgetow
-// czyli wszedzie tam, gdzie framework odwoluje sie do widgetow - nadpisac to wlasnymi klasami i je wywolywac
-
-class Test extends StatelessWidget {
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
-  }
-
-  @override
-  Element createElement() {
-    // TODO: implement createElement
-    throw UnimplementedError();
+    return MaterialApp(
+      home: HomeScreen(),
+    );
   }
 }
+
+void main() {
+  // debugRepaintRainbowEnabled = true;
+  setupLocator();
+  runApp(TodoApp());
+}
+
+//https://docs.flutter.dev/ui/layout/constraints
