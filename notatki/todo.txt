@@ -1,0 +1,22 @@
+jescze raz wrocic do pisania wlasnego szkieletu frameworka
+https://www.youtube.com/watch?v=og-vJqLzg2c
+
+kontynuowac budowanie prostych architekturalnych komponentow
+kolejny niech bedzie provider dla change notfiera
+porownac listenable builder
+sprawdzic canvas 
+liquid glass, shaders
+
+ekran logowania z uzyciem bloc oraz change notifier 
+sprawdzic riverpod jako alternatywe
+nastepnie zrobic logowanie do firebase 
+napisac wlasny prosty bloc/cubit; provider 
+porownac kiedy ktory lepszy i dlaczego bloc jest w ogole dobry
+
+w dalszej drodze skupic sie na UI - podstawowe widgety do wlasnego tworzenia grafik
+
+
+zaczac od listenable builder 0
+------------------
+widgets:
+AnimatedWidget, ListenableBuilder,po co child; 
