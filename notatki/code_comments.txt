@@ -1,7 +1,7 @@
 https://docs.flutter.dev/ui/layout/constraints
-zaczac od: framework - widgets 
-zaczac od drawFrame i buildScope (build owner)
 
+
+---------------------------
 1. 
 why here is called List.of instead of iterating through _observers directly?
 for (final WidgetsBindingObserver observer
@@ -19,3 +19,39 @@ You've highlighted a common pattern in Flutter's codebase, and the reason for us
 why firstFrameRasterized is so important?
 AI:
 firstFrameRasterized is a crucial metric in Flutter for several key reasons, all revolving around the perceived startup time and responsiveness of your application. It marks the point when the very first frame of your app's UI has been rendered to the screen
+
+--------------------------------------------
+3. inherited widget - updateShouldNotify 
+gdy StatefulWidget przechowuje w swoim stanie np ctr, ktory jest pobrany z CtrProvider (InheritedWidget); stan keszuje taki ctr 
+i odswieza tylko w metodzie didChangeDependencies
+wtedy mimo, ze inherited widget zrobi rebuild, to stan innego widgetu nie bedzie pobierał ctr, jesli ten jest taki sam 
+dla widgetu stateless -> jesli jest const MyWidget() to wtedy nalezy zarejestrowac dependency (bo inaczej build nie bedzie ponownie wykonany dla const widget; jesli zmieni sie dependecy, to build wykona sie dla const widget)
+
+--------------------------------------------
+4. 
+class A {
+  const A({this.x = 0});
+  final int x;
+}
+
+class B extends StatelessWidget {
+  const B({this.x = 0});
+  final int x;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text('B=$x');
+  }
+}
+
+why
+identical(const A(), const A()) returns true
+identical(const B(), const B()) returns false?
+
+https://github.com/flutter/flutter/issues/44858
+w skrocie: w dev mode tak jest, ale w release zwraca 2 razy true - #edit - ale jednak poodbno nie - zawsze dla widgetow zwracane jest false - taka modyfikacja w kompilatorze
+
+Now one main difference between your first and second cases is that a and b are Widgets in first case while in second case they are not.
+Now, flutter has a --track-widget-creation flag which is enabled by default in debug modes.
+This is the main culprit which makes your seemingly const widgets as non identical.
+Now this means that when you run your app in release mode, your widgets will indeed be compile time constants and thus the identical function would indeed return true.
